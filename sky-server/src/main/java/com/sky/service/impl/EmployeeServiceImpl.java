@@ -1,7 +1,9 @@
 package com.sky.service.impl;
 
 import com.sky.constant.MessageConstant;
+import com.sky.constant.PasswordConstant;
 import com.sky.constant.StatusConstant;
+import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
 import com.sky.entity.Employee;
 import com.sky.exception.AccountLockedException;
@@ -9,9 +11,11 @@ import com.sky.exception.AccountNotFoundException;
 import com.sky.exception.PasswordErrorException;
 import com.sky.mapper.EmployeeMapper;
 import com.sky.service.EmployeeService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.DigestUtils;
+
+import java.time.LocalDateTime;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
@@ -54,4 +58,40 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employee;
     }
 
+    @Override
+    public void save(Employee employee) {
+
+    }
+
+    /**
+     * 新增员工
+     *
+     * @param employeeDTO
+     */
+    @Override
+    public void save(EmployeeDTO employeeDTO) {
+        //1.创建Employee对象
+        Employee employee = new Employee();
+
+        //2.将用户录入的信息 封装到 Employee对象中
+//        employee.setName(employeeDTO.getName());
+
+        BeanUtils.copyProperties(employeeDTO, employee);
+
+
+        //3.手动给Employee其它的字段赋值
+        employee.setStatus(StatusConstant.ENABLE);
+
+        employee.setPassword(PasswordConstant.DEFAULT_PASSWORD);
+
+        employee.setCreateTime(LocalDateTime.now());
+        employee.setUpdateTime(LocalDateTime.now());
+
+        employee.setCreateUser(10L);
+        employee.setUpdateUser(10L);
+
+        //4.将数据传递给 mybatis
+        employeeMapper.save(employee);
+
+    }
 }
